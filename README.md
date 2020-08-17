@@ -1,6 +1,6 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/SWhardfish/CSVtoMatplotlib?style=plastic) [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)  ![Matplotlib 3.2.1](https://img.shields.io/badge/Matplotlib-3.2.1-brightgreen)  
 
-#Statistics from CSV to Graph using Pandas and Matplotlib
+#Statistics from CSV to Graph using Pandas and Matplotlib  
 -Python 3  
 -Pandas  
 -Matplotlib  
