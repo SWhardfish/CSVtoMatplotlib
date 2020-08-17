@@ -14,6 +14,7 @@ pd.set_option('display.max_columns', 100)
 pd.set_option('display.width', 1000)
 
 DataFiles = glob.glob('C:/Users/anders.rylander2/PycharmProjects/Stats/venv/Files/*Protocol*.csv') #creates a list of all csv files
+#DataFiles = glob.glob('*Protocol*.csv') #creates a list of all csv files
 
 data = []  # pd.concat takes a list of dataframes as an argument
 for csv in DataFiles:
@@ -26,17 +27,19 @@ df = pd.concat(data, ignore_index=True) #dont want pandas to try an align row in
 #REGEX to extract Date from Filename
 df['Date'] = df['Date'].str.extract('([0-9]{8})', expand=False)
 
-#Index DateTime columns and drop Date and Hour of Day columns
+#Index Date Column and Create DateTime column
 df.index = pd.to_datetime(df["Date"])
-####df = df.drop(columns=["Hour of Day", "Date"])
+
+#Drop Date column
+df = df.drop(columns=["Date"])
 
 #Date in Filename is for 1 day after so correcting here
 df.index = df.index + pd.Timedelta(days=-1)
 
-df['Total Bytes'] = df['Total Bytes']/1024/1024/1024
-df['Bytes Received'] = df['Bytes Received']/1024/1024/1024
-df['Bytes Sent'] = df['Bytes Sent']/1024/1024/1024
-df['Requests'] = df['Requests']/1000
+df['Total Bytes'] = df['Total Bytes']/1024/1024/1024 #Convert to GB
+df['Bytes Received'] = df['Bytes Received']/1024/1024/1024 #Convert to GB
+df['Bytes Sent'] = df['Bytes Sent']/1024/1024/1024 #Convert to GB
+df['Requests'] = df['Requests']/1000 #Convert to K Request
 
 #ratio = df['Bytes Received'] / df['Bytes Sent']
 #print(ratio)
@@ -44,7 +47,7 @@ df['Requests'] = df['Requests']/1000
 #print(df)
 
 
-#Sort index (date & time) in cronological order)
+#Sort index (date) in cronological order)
 df = df.sort_index()
 
 #Name index column
@@ -54,11 +57,15 @@ HTTP = df.loc[df['Protocol'] == 'http']
 #print(HTTP)
 HTTPS = df.loc[df['Protocol'] == 'https']
 #print(HTTPS)
+#print(df)
 
-HTTP['HTTPSReceived'] = HTTPS['Bytes Received'] #add the HTTPS column to HTTP DF
+HTTP['HTTPSReceived'] = HTTPS['Bytes Received'] #add the HTTPS column to the HTTP DF
 Ratio = (HTTP['HTTPSReceived'] / (HTTP['Bytes Received'] + HTTP['HTTPSReceived'])) * 100
-HTTP['Ratio'] = Ratio
+HTTP['Ratio'] = Ratio #add Ratio to the HTTP DF
+HTTP = HTTP.drop(columns=["Page Views", "Bytes Sent", "Total Bytes", "Protocol"])
 print(HTTP)
+
+
 
 #Stats = df['Requests'].describe()
 #print(Stats)
@@ -121,9 +128,9 @@ print('-------------------------------------------------------------------------
 
 #######TEST SUBPLOT2#####
 # Create two subplots sharing x axis
-xaxis = df.index
+#xaxis = df.index
 xHTTP = HTTP.index
-y1axis = Ratio
+y1axis = HTTP['Ratio']
 y2axis = HTTP['HTTPSReceived']
 y3axis = HTTP['Bytes Received']
 y4axis = HTTP['Requests']
